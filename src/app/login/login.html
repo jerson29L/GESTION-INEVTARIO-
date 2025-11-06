@@ -1,0 +1,69 @@
+<div class="min-h-screen bg-white flex relative overflow-hidden font-sans">
+  <div class="flex-1 relative hidden lg:flex items-center justify-center p-8 bg-gradient-to-br from-white via-slate-50 to-gray-50">
+  <img src="assets/Imagen-Principal.png" alt="Librería con útiles escolares" class="absolute inset-0 w-full h-full object-cover opacity-40 blur-sm pointer-events-none select-none" />
+    <div class="text-center text-slate-700 max-w-lg z-10 relative animate-slide-in-left">
+      <div class="mb-8">
+        <div class="w-24 h-24 bg-white shadow-lg rounded-3xl flex items-center justify-center mx-auto mb-6">
+          <lucide-icon name="BookOpen" class="h-12 w-12 text-green-500"></lucide-icon>
+        </div>
+        <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-slate-700 to-slate-500 bg-clip-text text-transparent">
+          YERB LIBRERÍA
+        </h1>
+        <p class="text-slate-500 text-xl font-medium">Sistema web para la gestión de inventario</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-1 flex items-center justify-center p-8 relative">
+    <div class="w-full max-w-md animate-slide-in-right">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center space-x-4 mb-6">
+          <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <lucide-icon name="BookOpen" class="h-8 w-8 text-white"></lucide-icon>
+          </div>
+          <div class="text-left">
+            <span class="text-3xl font-bold bg-gradient-to-r from-slate-700 to-green-500 bg-clip-text text-transparent">YERB LIBRERÍA</span>
+            <p class="text-sm text-slate-500 font-medium">Perú • Útiles Escolares</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card bg-white/70 backdrop-blur-lg shadow-2xl border-0">
+        <div class="card-body p-8">
+          <div class="text-center pb-6 space-y-3">
+            <h2 class="card-title text-3xl font-bold text-slate-700">Iniciar Sesión</h2>
+            <p class="text-slate-500">Accede al sistema de gestión</p>
+          </div>
+          <div class="space-y-6">
+            <label class="form-control w-full">
+              <div class="label"><span class="label-text text-sm font-semibold text-slate-700">Correo electrónico</span></div>
+              <input type="email" [(ngModel)]="email" placeholder="" class="input input-bordered w-full h-12 bg-white/80 pr-12 rounded-xl" />
+            </label>
+            <label class="form-control w-full">
+              <div class="label"><span class="label-text text-sm font-semibold text-slate-700">Contraseña</span></div>
+              <div class="relative">
+                <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" placeholder="*****" class="input input-bordered w-full h-12 bg-white/80 pr-12 rounded-xl" />
+                <button type="button" (click)="showPassword = !showPassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                  <lucide-icon [name]="showPassword ? 'EyeOff' : 'Eye'" class="h-5 w-5"></lucide-icon>
+                </button>
+              </div>
+            </label>
+            <div class="flex items-center justify-between">
+            </div>
+          </div>
+          <div class="card-actions mt-6">
+            <div *ngIf="errorMessage" class="alert alert-error mb-4">
+              {{ errorMessage }}
+            </div>
+            <button (click)="onLogin()" [disabled]="loading" class="btn btn-primary w-full h-12 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl shadow-lg border-none">
+              <span *ngIf="loading" class="loading loading-spinner mr-2"></span>
+              Acceder al Sistema
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-8">
+      </div>
+    </div>
+  </div>
+</div>

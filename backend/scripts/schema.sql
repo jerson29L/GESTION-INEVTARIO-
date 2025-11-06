@@ -1,0 +1,2 @@
+-- Archivo deshabilitado para producción. La base de datos debe existir previamente.
+-- Se mantiene como placeholder para referencia del esquema, pero no se ejecuta automáticamente.

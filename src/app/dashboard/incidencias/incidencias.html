@@ -1,0 +1,124 @@
+<div class="p-10 min-h-screen bg-gray-100">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Registro de Incidencias de Producto</h1>
+  <p class="text-gray-600 mb-10 text-lg">
+    Administra y registra las incidencias detectadas en el inventario: productos dañados, devoluciones o errores de registro.
+  </p>
+
+  <!-- Tarjeta principal -->
+  <div class="bg-white rounded-xl shadow p-8">
+    <form class="grid grid-cols-1 md:grid-cols-2 gap-6" (ngSubmit)="registrarIncidencia()">
+
+      <!-- Producto -->
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Producto</label>
+        <select class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+                [ngModel]="seleccionadoId" (ngModelChange)="onSelectProducto($event)" name="producto">
+          <option [ngValue]="null">Seleccionar...</option>
+          <option *ngFor="let p of productos" [ngValue]="p.id ?? p.id_producto">
+            {{ (p.nombre_producto || p.name) }} — {{ (p.codigo_producto || p.sku) }} (Stock: {{ p.stock_actual || p.stock }})
+          </option>
+        </select>
+      </div>
+
+      <!-- Tipo de incidencia -->
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Incidencia</label>
+        <select class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+                [(ngModel)]="tipoSeleccionadoId" name="tipo">
+          <option *ngFor="let t of tipos" [ngValue]="t.id">{{ t.nombre_tipo }}</option>
+        </select>
+      </div>
+
+      <!-- Cantidad afectada -->
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad Afectada</label>
+        <input type="number" min="1" placeholder="Ejemplo: 3"
+               class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+               [(ngModel)]="cantidad" name="cantidad" />
+        <p *ngIf="!validarCantidad()" class="text-sm text-red-600 mt-1">
+          La cantidad debe ser mayor a 0
+        </p>
+      </div>
+
+      <!-- Fecha de incidencia -->
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Incidencia</label>
+        <input type="date"
+               class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+               [(ngModel)]="fecha" name="fecha" />
+      </div>
+
+      <!-- Lote (solo lectura) -->
+      <div class="col-span-2 md:col-span-1">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Lote</label>
+        <input type="text" class="w-full border border-gray-200 bg-gray-100 text-gray-700 rounded-lg p-2" [value]="loteActual()" disabled />
+      </div>
+
+      <!-- Descripción detallada -->
+      <div class="col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Descripción Detallada</label>
+        <textarea rows="4" placeholder="Describe la incidencia con detalle..."
+                  class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  [(ngModel)]="descripcion" name="descripcion"></textarea>
+      </div>
+
+      <!-- Acción tomada (opcional) -->
+      <div class="col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Acción Tomada (opcional)</label>
+        <textarea rows="3" placeholder="Describe la acción tomada (si aplica)"
+                  class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  [(ngModel)]="accion" name="accion"></textarea>
+      </div>
+
+      <!-- Mensajes -->
+      <div class="col-span-2">
+        <div *ngIf="mensajeExito" class="p-3 rounded bg-green-100 text-green-700">{{ mensajeExito }}</div>
+        <div *ngIf="mensajeError" class="p-3 rounded bg-red-100 text-red-700">{{ mensajeError }}</div>
+      </div>
+
+      <!-- Botón registrar -->
+      <div class="col-span-2 flex justify-end">
+        <button type="submit" [disabled]="guardando || !productoSeleccionado || !tipoSeleccionadoId || !validarCantidad() || !descripcion.trim()"
+                class="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition disabled:bg-red-300">
+          {{ guardando ? 'Guardando...' : 'Registrar Incidencia' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Historial -->
+  <div class="bg-white rounded-xl shadow p-8 mt-8">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-semibold">Historial reciente</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-2 text-left text-xs text-gray-600 uppercase">Fecha</th>
+            <th class="px-4 py-2 text-left text-xs text-gray-600 uppercase">Tipo</th>
+            <th class="px-4 py-2 text-left text-xs text-gray-600 uppercase">Código</th>
+            <th class="px-4 py-2 text-left text-xs text-gray-600 uppercase">Producto</th>
+            <th class="px-4 py-2 text-left text-xs text-gray-600 uppercase">Cantidad</th>
+            <th class="px-4 py-2 text-left text-xs text-gray-600 uppercase">Lote</th>
+            <th class="px-4 py-2 text-left text-xs text-gray-600 uppercase">Acción/Obs</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y">
+          <tr *ngFor="let r of historial">
+            <td class="px-4 py-2">{{ r.fecha_incidencia | date:'dd/MM/yyyy' }}</td>
+            <td class="px-4 py-2">{{ r.tipo_incidencia }}</td>
+            <td class="px-4 py-2">{{ r.codigo_producto }}</td>
+            <td class="px-4 py-2">{{ r.nombre_producto }}</td>
+            <td class="px-4 py-2">{{ r.cantidad_afectada }}</td>
+            <td class="px-4 py-2">{{ r.lote || '-' }}</td>
+            <td class="px-4 py-2">{{ r.accion_tomada || r.descripcion_detallada }}</td>
+          </tr>
+          <tr *ngIf="historial.length === 0">
+            <td class="px-4 py-3 text-center text-gray-500" colspan="7">Sin incidencias registradas</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

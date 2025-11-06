@@ -1,0 +1,246 @@
+<div class="p-10 min-h-screen bg-gray-100">
+  <!-- Encabezado -->
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Registro de Salida de Productos</h1>
+  <p class="text-gray-600 mb-10 text-lg">
+    Registra las salidas de productos del inventario. Puedes agregar múltiples productos a la salida.
+  </p>
+
+  <!-- Mensajes de estado -->
+  <div *ngIf="mensajeExito" class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+    {{ mensajeExito }}
+  </div>
+  <div *ngIf="mensajeError" class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+    {{ mensajeError }}
+  </div>
+
+  <!-- Formulario principal -->
+  <div class="bg-white rounded-xl shadow p-8">
+    <form class="space-y-6" (ngSubmit)="registrarSalida()">
+      <!-- Selección de producto -->
+      <div class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Seleccionar Producto</label>
+          <select
+            [(ngModel)]="productoSeleccionadoId"
+            (ngModelChange)="seleccionarProducto($event)"
+            name="producto"
+            class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option [value]="0">Seleccione un producto</option>
+            <option *ngFor="let producto of productos" [value]="producto.id">
+              {{ producto.name }} - Stock: {{ producto.stock }} - Código: {{ producto.sku }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Tipo de Movimiento -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Salida</label>
+          <select
+            [(ngModel)]="movimiento.id_tipo_movimiento"
+            name="tipoMovimiento"
+            class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+            <option [value]="0">Seleccione un tipo</option>
+            <option *ngFor="let tipo of tiposMovimiento" [value]="tipo.id">
+              {{ tipo.nombre_tipo }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Información del producto -->
+        <div *ngIf="productoSeleccionado" class="p-4 bg-gray-50 rounded-lg">
+          <h3 class="font-medium text-gray-800">Información del Producto</h3>
+          <div class="mt-2 grid grid-cols-2 gap-4">
+            <p><span class="text-gray-600">Nombre:</span> {{ productoSeleccionado.name }}</p>
+            <p><span class="text-gray-600">Stock Actual:</span> {{ productoSeleccionado.stock }}</p>
+            <p><span class="text-gray-600">Código:</span> {{ productoSeleccionado.sku }}</p>
+            <p><span class="text-gray-600">Lote:</span> {{ productoSeleccionado.lote || 'No especificado' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cantidad y Lote -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad a Retirar</label>
+          <input
+            type="number"
+            [(ngModel)]="productoTemp.cantidad"
+            name="cantidad"
+            min="1"
+            [max]="productoSeleccionado?.stock || 1"
+            placeholder="Ejemplo: 10"
+            class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <p *ngIf="productoSeleccionado && !validarCantidad()" class="text-red-600 text-sm mt-1">
+            La cantidad debe ser mayor a 0 y menor o igual al stock disponible
+          </p>
+        </div>
+
+         <!-- Lote (solo lectura, se autocompleta al seleccionar producto) -->
+         <div>
+           <label class="block text-sm font-medium text-gray-700 mb-2">Lote</label>
+           <input
+             type="text"
+             [value]="productoTemp.lote_afectado || 'No especificado'"
+             name="lote"
+             class="w-full border border-gray-200 bg-gray-100 text-gray-700 rounded-lg p-2"
+             disabled
+           />
+         </div>
+      </div>
+
+      <!-- Fecha -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Salida</label>
+        <input
+          type="date"
+          [(ngModel)]="movimiento.fecha_movimiento"
+          name="fecha"
+          class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        />
+      </div>
+
+      <!-- Motivo/Observaciones -->
+      <div class="col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Motivo/Observaciones</label>
+        <textarea
+          [(ngModel)]="movimiento.observaciones"
+          name="observaciones"
+          rows="3"
+          placeholder="Detalle el motivo de la salida y cualquier observación relevante"
+          class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        ></textarea>
+      </div>
+
+      <!-- Lista de Productos Seleccionados -->
+      <div class="mt-6" *ngIf="movimiento.detalles.length > 0">
+        <h3 class="text-lg font-medium text-gray-800 mb-4">Productos Seleccionados</h3>
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Código</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Producto</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Cantidad</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Lote</th>
+                <th class="px-4 py-3 text-center text-sm font-medium text-gray-700">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let detalle of movimiento.detalles; let i = index" class="border-t border-gray-200">
+                <td class="px-4 py-3 text-sm text-gray-700">{{ detalle.producto_codigo }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ detalle.producto_nombre }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">
+                  <input 
+                    type="number" 
+                    [(ngModel)]="detalle.cantidad" 
+                    [name]="'cantidad-' + i"
+                    class="w-24 border border-gray-300 rounded px-2 py-1"
+                    (change)="editarCantidad(i, detalle.cantidad)"
+                  >
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ detalle.lote_afectado || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-center">
+                  <button 
+                    type="button"
+                    (click)="eliminarProducto(i)"
+                    class="text-red-600 hover:text-red-800"
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="mt-6 flex justify-between gap-4">
+        <button
+          type="button"
+          (click)="agregarProducto()"
+          [disabled]="guardando || !productoSeleccionado || !validarCantidad()"
+          class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition disabled:bg-green-300"
+        >
+          Agregar Producto
+        </button>
+
+        <div class="flex gap-4">
+          <button
+            type="button"
+            (click)="resetearFormulario()"
+            class="px-6 py-3 rounded-lg font-semibold border border-gray-300 hover:bg-gray-50 transition"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="guardando || movimiento.detalles.length === 0 || !movimiento.id_tipo_movimiento"
+            class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-blue-300"
+          >
+            {{ guardando ? 'Guardando...' : 'Registrar Salida' }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Historial de Salidas -->
+  <div class="mt-10">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">Historial de Salidas</h2>
+    </div>
+    
+    <div class="overflow-x-auto bg-white rounded-xl shadow">
+      <table class="min-w-full">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lote</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observaciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let mov of historialSalidas" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ mov.fecha_movimiento | date:'dd/MM/yyyy' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ mov.tipo_movimiento }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ mov.codigo_producto }}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-900">
+              {{ mov.nombre_producto }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ mov.cantidad }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ mov.lote_afectado || '-' }}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-900">
+              {{ mov.observaciones }}
+            </td>
+          </tr>
+          <tr *ngIf="historialSalidas.length === 0">
+            <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+              No hay salidas registradas
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

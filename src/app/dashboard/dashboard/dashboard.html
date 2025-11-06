@@ -1,0 +1,81 @@
+<div class="p-6 bg-gray-100 min-h-screen">
+  <!-- Encabezado -->
+  <div class="flex items-center justify-between mb-2">
+    <h1 class="text-3xl font-bold text-gray-800">Panel de Control de Inventario</h1>
+    <button 
+      (click)="refreshStats()" 
+      [disabled]="isLoading"
+      class="bg-gray-800 text-white text-sm px-4 py-2 rounded-md hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed">
+      <span *ngIf="!isLoading">Actualizar</span>
+      <span *ngIf="isLoading">Actualizando...</span>
+    </button>
+  </div>
+  <p class="text-gray-600 mb-8">Monitorea el estado de tus productos y movimientos</p>
+
+  <!-- Indicadores principales -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div *ngFor="let stat of stats; trackBy: trackByTitle"
+         class="bg-white rounded-lg p-5 border text-center hover:shadow-md transition">
+      <h3 class="text-sm font-medium text-gray-500 mb-1">{{ stat.title }}</h3>
+      <p class="text-2xl font-bold" [ngClass]="stat.color">{{ stat.value }}</p>
+      <span
+        [ngClass]="{'text-green-600': stat.changeType === 'positive', 'text-red-600': stat.changeType === 'negative'}"
+        class="text-sm"
+      >
+        {{ stat.change }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Reportes generados -->
+  <div class="bg-white rounded-lg p-6 border mb-6">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Reportes Generados</h2>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="text-gray-600 border-b">
+            <th class="py-2 text-left">Fecha</th>
+            <th class="py-2 text-left">Tipo</th>
+            <th class="py-2 text-left">Parámetros</th>
+            <th class="py-2 text-left">Descargar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of reportes; trackBy: trackByReporte" class="border-b hover:bg-gray-50">
+            <td class="py-2 text-gray-700">{{ r.fecha_generacion | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td class="py-2 font-semibold text-gray-800">{{ r.tipo_reporte }}</td>
+            <td class="py-2 text-gray-600">
+              <span class="text-xs bg-gray-100 px-2 py-1 rounded" *ngIf="r.displayParams; else noParams">{{ r.displayParams }}</span>
+              <ng-template #noParams><span class="text-xs text-gray-400">—</span></ng-template>
+            </td>
+            <td class="py-2">
+              <a [href]="serverBase + '/api/reportes/' + r.id_reporte + '/pdf'" target="_blank" class="text-blue-600 hover:underline">Descargar PDF</a>
+            </td>
+          </tr>
+          <tr *ngIf="reportes.length === 0">
+            <td colspan="4" class="py-4 text-center text-gray-500">No hay reportes generados aún</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Reportes -->
+  <div class="bg-white rounded-lg p-6 border">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Generar Reportes</h2>
+    <div class="flex flex-col md:flex-row gap-3">
+      <button (click)="generarReporteInventarioActual()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+        Inventario Actual
+      </button>
+      <button (click)="generarReporteMovimientos()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+        Reporte salidas
+      </button>
+      <button (click)="generarReporteEstadistico()" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+        Reportes incidencias
+      </button>
+      <button (click)="generarReporteTopSalidas()" class="bg-amber-600 text-white px-4 py-2 rounded-md hover:bg-amber-700">
+        Top Productos (Salidas)
+      </button>
+    </div>
+  </div>
+</div>

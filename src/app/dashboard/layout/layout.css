@@ -1,0 +1,29 @@
+.active-dashboard {
+  background: linear-gradient(to right, #22c55e, #16a34a);
+  color: #fff;
+}
+
+.active-productos {
+  background: linear-gradient(to right, #3b82f6, #60a5fa);
+  color: #fff;
+}
+
+.active-categorias {
+  background: linear-gradient(to right, #ff9800, #ffb74d);
+  color: #fff;
+}
+
+.active-orders {
+  background: linear-gradient(to right, #a78bfa, #8b5cf6);
+  color: #fff;
+}
+
+.active-clients {
+  background: linear-gradient(to right, #ec4899, #f472b6);
+  color: #fff;
+}
+
+.active-settings {
+  background: linear-gradient(to right, #6b7280, #9ca3af);
+  color: #fff;
+}
