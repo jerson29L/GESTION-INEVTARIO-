@@ -71,7 +71,8 @@ app.get('/api', (req, res) => {
 });
 
 // Todas las demás rutas devuelven el index.html de Angular (SPA)
-app.get('*', (req, res) => {
+// Express 5 requiere usar app.use() para catch-all en lugar de app.get('*')
+app.use((req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
