@@ -82,13 +82,12 @@ export class DashboardComponent {
 
         // Para ingresos totales (valor inventario), no mostramos cambio porcentual
         const chIng = { text: '', type: 'positive' as const };
-        const chSal = this.pctChange(salidas, salidasPrev);
 
         this.stats = [
           { title: 'Ingresos Totales', value: this.formatCurrency(ingresos), change: chIng.text, changeType: chIng.type, color: 'bg-green-100 text-green-700' },
           { title: 'Productos en Inventario', value: String(productos), change: '', changeType: 'positive', color: 'bg-blue-100 text-blue-700' },
           { title: 'Stock Crítico', value: String(criticos), change: '', changeType: 'negative', color: 'bg-orange-100 text-orange-700' },
-          { title: 'Salidas de Inventario', value: String(salidas), change: chSal.text, changeType: chSal.type, color: 'bg-red-100 text-red-700' }
+          { title: 'Salidas de Inventario', value: String(salidas), change: '', changeType: 'positive', color: 'bg-red-100 text-red-700' }
         ];
         this.isLoading = false;
         console.log('Dashboard stats updated:', this.stats);

@@ -5,7 +5,9 @@
 
 // URLs de API
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:3000',
+  BASE_URL: typeof window !== 'undefined' && window.location.hostname !== 'localhost' 
+    ? '' // En producción, usa URLs relativas (mismo servidor)
+    : 'http://localhost:3000', // En desarrollo, usa localhost
   ENDPOINTS: {
     AUTH: '/api/auth',
     PRODUCTOS: '/api/productos',

@@ -21,7 +21,6 @@
           <th class="text-left px-6 py-3 font-semibold">Nombre</th>
           <th class="text-left px-6 py-3 font-semibold">Email</th>
           <th class="text-left px-6 py-3 font-semibold">Rol</th>
-          <th class="text-left px-6 py-3 font-semibold">Estado</th>
           <th class="text-center px-6 py-3 font-semibold">Acciones</th>
         </tr>
       </thead>
@@ -31,11 +30,6 @@
           <td class="px-6 py-3 font-medium text-gray-800">{{ usuario.nombre_completo }}</td>
           <td class="px-6 py-3 text-gray-700">{{ usuario.email }}</td>
           <td class="px-6 py-3">{{ usuario.rol_nombre }}</td>
-          <td class="px-6 py-3">
-          <span [ngClass]="{ 'text-green-600 font-semibold': usuario.estado === 1, 'text-red-600 font-semibold': usuario.estado === 0 }">
-            {{ usuario.estado === 1 ? 'Activo' : 'Inactivo' }}
-          </span>
-          </td>
           <td class="px-6 py-3 text-center">
             <button (click)="openEditUser(usuario)" class="mx-1 px-3 py-1 bg-blue-50 text-blue-600 rounded border border-blue-200">Editar</button>
             <button (click)="askDelete(usuario)" class="mx-1 px-3 py-1 bg-red-50 text-red-600 rounded border border-red-200">Eliminar</button>
@@ -72,14 +66,6 @@
         </div>
 
         <div>
-          <label class="block text-sm text-gray-700 mb-1">Estado</label>
-          <select [(ngModel)]="editingUser.estado" class="select select-bordered w-full p-2 border rounded">
-              <option [ngValue]="1">Activo</option>
-              <option [ngValue]="0">Inactivo</option>
-          </select>
-        </div>
-
-        <div>
           <label class="block text-sm text-gray-700 mb-1">Contraseña</label>
           <input [(ngModel)]="editingUser.password" class="input input-bordered w-full p-2 border rounded" type="password" placeholder="Dejar vacío para mantener la contraseña actual" />
           <p class="text-xs text-gray-500 mt-1">Si estás editando el usuario, deja este campo vacío para conservar la contraseña actual; escribe una nueva contraseña para actualizarla.</p>
@@ -97,7 +83,7 @@
   <div *ngIf="showDeleteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl w-full max-w-md p-6">
       <h3 class="text-lg font-semibold mb-4">Confirmar eliminación</h3>
-      <p class="mb-6">¿Deseas marcar como Inactivo al usuario <strong>{{ userToDelete?.nombre_completo }}</strong>?</p>
+      <p class="mb-6">¿Deseas eliminar al usuario <strong>{{ userToDelete?.nombre_completo }}</strong>?</p>
       <div class="text-right">
         <button (click)="closeDelete()" class="mr-2 px-4 py-2 rounded border">Cancelar</button>
         <button (click)="confirmDelete()" class="px-4 py-2 bg-red-600 text-white rounded">Confirmar</button>

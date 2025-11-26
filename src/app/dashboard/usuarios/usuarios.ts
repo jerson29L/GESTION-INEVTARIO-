@@ -40,8 +40,7 @@ export class UsuariosComponent implements OnInit {
       nombre_completo: '',
       email: '',
       password: '',
-      id_rol: this.roles[1]?.id || 2,
-        estado: 1
+      id_rol: this.roles[1]?.id || 2
     };
     this.showFormModal = true;
     this.clearMessages();

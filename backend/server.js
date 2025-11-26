@@ -61,9 +61,18 @@ app.use('/reportes', express.static(path.join(__dirname, 'reportes'), {
   }
 }));
 
-// Ruta básica
-app.get('/', (req, res) => {
+// Servir archivos estáticos del frontend (Angular build)
+const frontendPath = path.join(__dirname, '..', 'dist', 'proyecto-yerb-amazon', 'browser');
+app.use(express.static(frontendPath));
+
+// Ruta básica para API
+app.get('/api', (req, res) => {
   res.json({ message: 'Backend Yerb Amazon funcionando' });
+});
+
+// Todas las demás rutas devuelven el index.html de Angular (SPA)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 // Seed inicial opcional (habilitar con SEED_ADMIN=true): crear rol Administrador y usuario admin si no existen

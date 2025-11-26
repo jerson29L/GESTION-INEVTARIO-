@@ -21,6 +21,10 @@ yarn-error.log
 # Backend logs
 backend/out.txt
 
+# Database backups (optional - descomenta si no quieres subir el backup)
+# backend/database_backup.sql
+backend/*.sql
+
 # IDEs and editors
 .idea/
 .project
